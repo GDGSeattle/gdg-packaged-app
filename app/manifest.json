@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "GDG Packaged App Demo",
+  "description": "Sample App - Austin GDG Dev Fest, 2013",
+  "version": "0.1",
+  "app": {
+    "background": {
+      "scripts": ["js/background.js"]
+    }
+  },
+  "icons": {
+    "16": "images/gdg-pa-16.png",
+    "128": "images/gdg-pa-128.png"
+  }
+}
