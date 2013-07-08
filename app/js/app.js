@@ -27,6 +27,18 @@ angular.module('gdgPackagedApp', [])
                 }
                 return $location.path() == path ? 'active' : '';
             }
+
+            $scope.newWindow = function() {
+                var bounds = chrome.app.window.current().getBounds();
+                var newBounds =  {
+                    left: (bounds.left + 50) % (screen.width - bounds.width),
+                    // Need some slop or chrome positions window higher than desired (Mac only)?
+                    top: (bounds.top + 50) % (screen.height - bounds.height - 80),
+                    width: bounds.width,
+                    height: bounds.height
+                };
+                chrome.app.window.create('index.html', {bounds: newBounds});
+            }
         },
 
         "HomeController": function($scope) {

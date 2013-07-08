@@ -11,18 +11,18 @@
     <div class="navbar-inner">
       <div class="container">
         <ul class="nav">
-          <li class="{{ navClass('') }}"><a ng-click="nav('')">Home</a></li>
+          <li class="{{ navClass('') }}"><a ng-click="nav('')">Chat</a></li>
           <li class="{{ navClass('about') }}"><a ng-click="nav('about')">About</a></li>
         </ul>
+        <div class="pull-right">
+          <button class="btn" ng-click="newWindow()">New Window</button>
+        </div>
       </div>
     </div>
   </div>
 
 
-  <div class="container">
-    <h1>Hello, {{ appName }}!</h1>
-    <div ng-view></div>
-  </div>
+  <div class="container" ng-view></div>
 
   <script src="/js/jquery.js"></script>
   <script src="/js/bootstrap.js"></script>
