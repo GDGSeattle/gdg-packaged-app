@@ -13,8 +13,30 @@ angular.module('gdgPackagedApp', [])
                 redirectTo: '/'
             });
     })
+    .service({
+        MessageService: function() {
+            this.messages = [];
+
+            this.listeners = [];
+            this.onChange = function(listener) {
+                this.listeners.push(listener);
+                listener(this.messages);
+            };
+
+            this.updateListeners = function() {
+                for (var i = 0; i < this.listeners.length; i++) {
+                    this.listeners[i](this.messages);
+                }
+            }
+
+            this.addMessage = function (message) {
+                this.messages.push(message);
+                this.updateListeners();
+            };
+        }
+    })
     .controller({
-        "NavController": function ($scope, $location) {
+        NavController: function ($scope, $location) {
             $scope.appName = "GDG Austin Dev Fest";
             $scope.errorMessage = '';
 
@@ -46,33 +68,33 @@ angular.module('gdgPackagedApp', [])
             };
         },
 
-        "ChatController": function($scope) {
-            $scope.messages = [
-                {text: "Sample message", from: "sample"},
-                {text: "Sample message too", from: "sample"}
-            ];
-
-            function addMessage(message) {
-                $scope.messages.push(message);
-            }
+        ChatController: function($scope, $rootScope, MessageService) {
+            $scope.$watch('userName', function() {
+                $rootScope.userName = $scope.userName;
+            });
 
             $scope.sendMessage = function () {
                 $scope.showError('');
                 if (!$scope.userName) {
                     $scope.showError("Please enter a user name.");
+                    $('#user-name').focus();
                     return;
                 }
                 if (!$scope.messageText) {
                     $scope.showError("Empty message.");
                     return;
                 }
-                addMessage({from: $scope.userName,
-                            text: $scope.messageText});
+                MessageService.addMessage({from: $rootScope.userName,
+                                           text: $scope.messageText});
                 $scope.messageText = "";
             }
+
+            MessageService.onChange(function(messages) {
+                $scope.messages = messages;
+            });
         },
 
-        "AboutController": function($scope) {
+        AboutController: function($scope) {
         }
 
         });
