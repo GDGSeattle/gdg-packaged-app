@@ -1,0 +1,13 @@
+<h2>Chat demo</h2>
+<div ng-hide="errorMessage == ''" class="alert">
+  <button type="button" class="close" ng-click="showError('');">&times;</button>
+  <span>{{ errorMessage }}&nbsp;</span>
+</div>
+<input id="userName" type="text" placeholder="enter user name" ng-model="userName">
+<div ng-repeat="message in messages">
+  {{ $index + 1 }}. <span class="from">{{ message.from }}</span>: {{ message.text }}
+</div>
+<form class="input-append">
+  <input class="input-block-level" type="text" ng-model="messageText">
+  <input type="submit" class="btn" ng-click="sendMessage();">Send</button>
+</form>

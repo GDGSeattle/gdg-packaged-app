@@ -1,3 +1,11 @@
 body {
   padding-top: 60px;
 }
+
+.from {
+font-style: italic;
+}
+
+.input-append {
+width: 90%;
+}

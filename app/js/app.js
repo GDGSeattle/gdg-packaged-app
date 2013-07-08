@@ -2,8 +2,8 @@ angular.module('gdgPackagedApp', [])
     .config(function ($routeProvider) {
         $routeProvider
             .when('/', {
-                templateUrl: 'views/home.html',
-                controller: 'HomeController'
+                templateUrl: 'views/chat.html',
+                controller: 'ChatController'
             })
             .when('/about', {
                 templateUrl: 'views/about.html',
@@ -16,6 +16,7 @@ angular.module('gdgPackagedApp', [])
     .controller({
         "NavController": function ($scope, $location) {
             $scope.appName = "GDG Austin Dev Fest";
+            $scope.errorMessage = '';
 
             $scope.nav = function(path) {
                 $location.path(path);
@@ -39,9 +40,36 @@ angular.module('gdgPackagedApp', [])
                 };
                 chrome.app.window.create('index.html', {bounds: newBounds});
             }
+
+            $scope.showError = function (message) {
+                $scope.errorMessage = message;
+            };
         },
 
-        "HomeController": function($scope) {
+        "ChatController": function($scope) {
+            $scope.messages = [
+                {text: "Sample message", from: "sample"},
+                {text: "Sample message too", from: "sample"}
+            ];
+
+            function addMessage(message) {
+                $scope.messages.push(message);
+            }
+
+            $scope.sendMessage = function () {
+                $scope.showError('');
+                if (!$scope.userName) {
+                    $scope.showError("Please enter a user name.");
+                    return;
+                }
+                if (!$scope.messageText) {
+                    $scope.showError("Empty message.");
+                    return;
+                }
+                addMessage({from: $scope.userName,
+                            text: $scope.messageText});
+                $scope.messageText = "";
+            }
         },
 
         "AboutController": function($scope) {
