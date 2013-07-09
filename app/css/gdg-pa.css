@@ -4,8 +4,24 @@ body {
 
 .from {
 font-style: italic;
+width: 50px;
+display: inline-block;
 }
 
 .input-append {
-width: 90%;
+width: 88%;
+margin-top: 15px;
+}
+
+div.chat {
+overflow: auto;
+width: 96%;
+height: 250px;
+border: 1px solid #444;
+background: #eee;
+padding: 0 10px;
+}
+
+div.chat > div {
+list-style-type: none;
 }

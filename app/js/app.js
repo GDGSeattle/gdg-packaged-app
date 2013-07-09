@@ -44,6 +44,7 @@ angular.module('gdgPackagedApp', [])
                         obj.messages = [];
                     }
                     obj.messages.push(message);
+                    obj.messages = obj.messages.slice(-100);
                     chrome.storage.local.set(obj);
                 });
             };
@@ -82,10 +83,12 @@ angular.module('gdgPackagedApp', [])
             };
         },
 
-        ChatController: function($scope, $rootScope, MessageService) {
+        ChatController: function($scope, $rootScope, $timeout, MessageService) {
             $scope.$watch('userName', function() {
                 $rootScope.userName = $scope.userName;
             });
+
+            var chatDiv = $('div.chat')[0];
 
             $scope.sendMessage = function () {
                 $scope.showError('');
@@ -109,6 +112,11 @@ angular.module('gdgPackagedApp', [])
                 // Need call $apply since this is an aysnc update to the scope.
                 $scope.$apply(function () {
                     $scope.messages = messages;
+                    // After page update - scroll to bottom - better to force scroll to bottom
+                    // on update?
+                    $timeout(function() {
+                        chatDiv.scrollTop = chatDiv.scrollHeight;
+                    });
                 });
             });
         },
