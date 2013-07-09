@@ -26,17 +26,16 @@ socket.getNetworkList(function (adaptors) {
 function sendSocketData(ipRemote, data) {
     console.log("UDP send", data);
     socket.sendTo(socketId, stringToBuffer(data), ipRemote, udpPort, function (result) {
-            console.log("sent", result);
+        console.log("sent", result);
     });
 }
 
 function stringToBuffer(s) {
-    var b = new ArrayBuffer(s.length);
-    var v = new Uint8Array(b);
+    var v = new Uint8Array(s.length);
     for (var i = 0; i < s.length; i++) {
         v[i] = s.charCodeAt(i);
     }
-    return b;
+    return v.buffer;
 }
 
 function bufferToString(b) {
