@@ -3,34 +3,48 @@ chrome.app.runtime.onLaunched.addListener(function() {
 });
 
 var socket = chrome.socket;
-var ipAddress;
+var serverIP;
 var udpPort = 9876;
-var socketId;
+var clientId;
+var serverId;
 
 socket.getNetworkList(function (adaptors) {
     for (var i = 0; i < adaptors.length; i++) {
         if (adaptors[i].address.indexOf(':') == -1) {
-            ipAddress = adaptors[i].address;
+            serverIP = adaptors[i].address;
             break;
         }
     }
 
     socket.create('udp', {}, function(socketInfo) {
-        socket.bind(socketInfo.socketId, ipAddress, udpPort, function(result) {
-            socketId = socketInfo.socketId;
-            console.log("UDP bound", socketInfo);
+        serverId = socketInfo.socketId;
+        socket.bind(serverId, '127.0.0.1', udpPort, function(result) {
+            if (result < 0) {
+                console.log("Could not bind listening UDP port " + udpPort);
+            }
+        });
+
+        socket.recvFrom(serverId, 1024, function(info) {
+            if (info.resultCode < 0) {
+                console.log("Reader error", info);
+                return;
+            }
+            if (info.data.byteLength != 0) {
+                console.log("UDP Read: '" + bufferToString(info.data) + "'");
+            }
         });
     });
 });
 
-function handleDataEvent(d) {
-    console.log(d);
-}
+function sendSocketData(remoteIP, data) {
+    socket.create('udp', null, function(createInfo) {
+        clientId = createInfo.socketId;
 
-function sendSocketData(ipRemote, data) {
-    console.log("UDP send", data);
-    socket.sendTo(socketId, stringToBuffer(data), ipRemote, udpPort, function (result) {
-        console.log("sent", result);
+        socket.connect(clientId, remoteIP, udpPort, function(result) {
+            socket.write(clientId, stringToBuffer(data), function(info){
+                socket.destroy(clientId);
+            });
+        });
     });
 }
 
@@ -51,16 +65,4 @@ function bufferToString(b) {
     return s;
 }
 
-setInterval(udpReader, 1000);
-
-function udpReader() {
-    socket.recvFrom(socketId, 10000, function(info) {
-        if (info.resultCode < 0) {
-            console.log("Reader error", info);
-            return;
-        }
-        if (info.data.byteLength != 0) {
-            console.log("read", bufferToString(info.data));
-        }
-    });
-}
+sendSocketData('127.0.0.1', "test data");
