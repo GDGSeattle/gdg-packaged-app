@@ -19,24 +19,33 @@ socket.getNetworkList(function (adaptors) {
         socketId = socketInfo.socketId;
         socket.bind(socketId, '127.0.0.1', udpPort, function(result) {
             if (result < 0) {
-                console.log("Could not bind listening UDP port " + udpPort);
+                console.error("Could not bind listening UDP port " + udpPort);
             }
         });
 
-        socket.recvFrom(socketId, 1024, function(info) {
-            if (info.resultCode < 0) {
-                console.log("Reader error", info);
-                return;
-            }
-            if (info.data.byteLength != 0) {
-                console.log("UDP Read: '" + bufferToString(info.data) + "'");
-            }
-        });
+        setTimeout(readUDP, 1);
     });
 });
 
+function readUDP() {
+    socket.recvFrom(socketId, 1024, function(info) {
+        if (info.resultCode < 0) {
+            console.erro("Reader error", info);
+            return;
+        }
+        if (info.data.byteLength != 0) {
+            console.log("UDP Read: '" + bufferToString(info.data) + "'");
+        }
+        setTimeout(readUDP, 1);
+    });
+}
+
 function sendSocketData(remoteIP, data) {
     socket.sendTo(socketId, stringToBuffer(data), remoteIP, udpPort, function(result) {
+        if (result.bytesWritten < 0) {
+            console.error("Could not send string (" + result.bytesWritten + ")");
+            return;
+        }
         console.log("Sent string: '" + data + "' (" + result.bytesWritten + ")");
     });
 }
