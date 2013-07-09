@@ -6,20 +6,24 @@ var socket = chrome.socket;
 var serverIP;
 var udpPort = 9876;
 var socketId;
+var clientId;
 
 socket.getNetworkList(function (adaptors) {
     for (var i = 0; i < adaptors.length; i++) {
         if (adaptors[i].address.indexOf(':') == -1) {
             serverIP = adaptors[i].address;
+            // BUG: This is the only address I can bind to!
+            serverIP = '127.0.0.1';
             break;
         }
     }
 
     socket.create('udp', {}, function(socketInfo) {
         socketId = socketInfo.socketId;
-        socket.bind(socketId, '127.0.0.1', udpPort, function(result) {
+        socket.bind(socketId, serverIP, udpPort, function(result) {
             if (result < 0) {
-                console.error("Could not bind listening UDP port " + udpPort);
+                console.error("Could not bind listening UDP port " + serverIP + ':' + udpPort +
+                             " (" + result + ")");
             }
         });
 
@@ -41,12 +45,18 @@ function readUDP() {
 }
 
 function sendSocketData(remoteIP, data) {
-    socket.sendTo(socketId, stringToBuffer(data), remoteIP, udpPort, function(result) {
-        if (result.bytesWritten < 0) {
-            console.error("Could not send string (" + result.bytesWritten + ")");
-            return;
-        }
-        console.log("Sent string: '" + data + "' (" + result.bytesWritten + ")");
+    socket.create('udp', null, function(createInfo) {
+        clientId = createInfo.socketId;
+        socket.connect(clientId, remoteIP, udpPort, function(result) {
+            socket.write(clientId, stringToBuffer(data), function(result){
+                if (result.bytesWritten < 0) {
+                    console.error("Could not write string (" + result.bytesWritten + ")");
+                    return;
+                }
+                console.log("Sent string: '" + data + "' (" + result.bytesWritten + ")");
+                socket.destroy(clientId);
+            });
+        });
     });
 }
 
@@ -68,6 +78,6 @@ function bufferToString(b) {
 }
 
 setTimeout(function () {
-    sendSocketData('127.0.0.1', "test data");
-},
+               sendSocketData(serverIP, "test data");
+           },
            1000);
