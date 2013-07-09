@@ -3,32 +3,21 @@ chrome.app.runtime.onLaunched.addListener(function() {
 });
 
 var socket = chrome.socket;
-var serverIP;
+var serverIP = '0.0.0.0';
 var udpPort = 9876;
 var socketId;
 var clientId;
 
-socket.getNetworkList(function (adaptors) {
-    for (var i = 0; i < adaptors.length; i++) {
-        if (adaptors[i].address.indexOf(':') == -1) {
-            serverIP = adaptors[i].address;
-            // BUG: This is the only address I can bind to!
-            serverIP = '127.0.0.1';
-            break;
+socket.create('udp', {}, function(socketInfo) {
+    socketId = socketInfo.socketId;
+    socket.bind(socketId, serverIP, udpPort, function(result) {
+        if (result < 0) {
+            console.error("Could not bind listening UDP port " + serverIP + ':' + udpPort +
+                         " (" + result + ")");
         }
-    }
-
-    socket.create('udp', {}, function(socketInfo) {
-        socketId = socketInfo.socketId;
-        socket.bind(socketId, serverIP, udpPort, function(result) {
-            if (result < 0) {
-                console.error("Could not bind listening UDP port " + serverIP + ':' + udpPort +
-                             " (" + result + ")");
-            }
-        });
-
-        setTimeout(readUDP, 1);
     });
+
+    setTimeout(readUDP, 1);
 });
 
 function readUDP() {
@@ -38,7 +27,8 @@ function readUDP() {
             return;
         }
         if (info.data.byteLength != 0) {
-            console.log("UDP Read: '" + bufferToString(info.data) + "'");
+            console.log("UDP From: " + info.address + ":" + info.port + ": '" +
+                        bufferToString(info.data) + "'");
         }
         setTimeout(readUDP, 1);
     });
@@ -53,7 +43,8 @@ function sendSocketData(remoteIP, data) {
                     console.error("Could not write string (" + result.bytesWritten + ")");
                     return;
                 }
-                console.log("Sent string: '" + data + "' (" + result.bytesWritten + ")");
+                console.log("UDP To: " + remoteIP + ":" + udpPort + ":'" +
+                            data + "' (" + result.bytesWritten + " bytes)");
                 socket.destroy(clientId);
             });
         });
