@@ -3,6 +3,7 @@
   "name": "GDG Packaged App Demo",
   "description": "Sample App - Austin GDG Dev Fest, 2013",
   "version": "0.1",
+  "permissions": ["storage"],
   "app": {
     "background": {
       "scripts": ["js/background.js"]

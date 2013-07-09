@@ -15,23 +15,37 @@ angular.module('gdgPackagedApp', [])
     })
     .service({
         MessageService: function() {
-            this.messages = [];
+            var self = this;
+            chrome.storage.local.get('messages', function(obj) {
+                self.updateListeners(obj.messages);
+            });
+
+            chrome.storage.onChanged.addListener(function(changes, areaName) {
+                self.updateListeners(changes.messages.newValue);
+            });
 
             this.listeners = [];
-            this.onChange = function(listener) {
+            this.addListener = function(listener) {
                 this.listeners.push(listener);
-                listener(this.messages);
+                chrome.storage.local.get('messages', function(obj) {
+                    listener(obj.messages);
+                });
             };
 
-            this.updateListeners = function() {
+            this.updateListeners = function(messages) {
                 for (var i = 0; i < this.listeners.length; i++) {
-                    this.listeners[i](this.messages);
+                    this.listeners[i](messages);
                 }
             }
 
             this.addMessage = function (message) {
-                this.messages.push(message);
-                this.updateListeners();
+                chrome.storage.local.get('messages', function(obj) {
+                    if (!obj.messages) {
+                        obj.messages = [];
+                    }
+                    obj.messages.push(message);
+                    chrome.storage.local.set(obj);
+                });
             };
         }
     })
@@ -77,20 +91,25 @@ angular.module('gdgPackagedApp', [])
                 $scope.showError('');
                 if (!$scope.userName) {
                     $scope.showError("Please enter a user name.");
+                    // TODO: Should not reference DOM from controller (testability)
                     $('#user-name').focus();
                     return;
                 }
                 if (!$scope.messageText) {
+
                     $scope.showError("Empty message.");
                     return;
                 }
-                MessageService.addMessage({from: $rootScope.userName,
+                MessageService.addMessage({from: $scope.userName,
                                            text: $scope.messageText});
                 $scope.messageText = "";
             }
 
-            MessageService.onChange(function(messages) {
-                $scope.messages = messages;
+            MessageService.addListener(function(messages) {
+                // Need call $apply since this is an aysnc update to the scope.
+                $scope.$apply(function () {
+                    $scope.messages = messages;
+                });
             });
         },
 
