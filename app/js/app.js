@@ -122,6 +122,17 @@ angular.module('gdgPackagedApp', [])
         },
 
         AboutController: function($scope) {
+            console.log("AboutController");
+            chrome.socket.getNetworkList(function (adaptors) {
+                $scope.$apply(function () {
+                    $scope.adaptors = [];
+                    for (var i = 0; i < adaptors.length; i++) {
+                        if (adaptors[i].address.indexOf(':') == -1) {
+                            $scope.adaptors.push(adaptors[i]);
+                        }
+                    }
+                });
+            });
         }
 
         });
