@@ -23,6 +23,10 @@ socket.getNetworkList(function (adaptors) {
     });
 });
 
+function handleDataEvent(d) {
+    console.log(d);
+}
+
 function sendSocketData(ipRemote, data) {
     console.log("UDP send", data);
     socket.sendTo(socketId, stringToBuffer(data), ipRemote, udpPort, function (result) {
@@ -45,4 +49,18 @@ function bufferToString(b) {
         s += String.fromCharCode(v[i]);
     }
     return s;
+}
+
+setInterval(udpReader, 1000);
+
+function udpReader() {
+    socket.recvFrom(socketId, 10000, function(info) {
+        if (info.resultCode < 0) {
+            console.log("Reader error", info);
+            return;
+        }
+        if (info.data.byteLength != 0) {
+            console.log("read", bufferToString(info.data));
+        }
+    });
 }
