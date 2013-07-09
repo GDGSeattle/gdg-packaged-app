@@ -15,6 +15,16 @@ angular.module('gdgPackagedApp', [])
     })
     .service({
         MessageService: function() {
+            var udpServer;
+
+            namespace.gdg.network.init(function () {
+                udpServer = namespace.gdg.network.UDPServer(9876);
+            });
+
+            this.getUDPServer = function () {
+                return udpServer;
+            }
+
             var self = this;
             chrome.storage.local.get('messages', function(obj) {
                 self.updateListeners(obj.messages);
@@ -88,21 +98,23 @@ angular.module('gdgPackagedApp', [])
                 $rootScope.userName = $scope.userName;
             });
 
+            // TODO: not angular-idiomatic - should use a directive?
             var chatDiv = $('div.chat')[0];
 
             $scope.sendMessage = function () {
                 $scope.showError('');
                 if (!$scope.userName) {
                     $scope.showError("Please enter a user name.");
-                    // TODO: Should not reference DOM from controller (testability)
+                    // TODO: not idiomatic?
                     $('#user-name').focus();
                     return;
                 }
-                if (!$scope.messageText) {
 
+                if (!$scope.messageText) {
                     $scope.showError("Empty message.");
                     return;
                 }
+
                 MessageService.addMessage({from: $scope.userName,
                                            text: $scope.messageText});
                 $scope.messageText = "";
@@ -111,6 +123,7 @@ angular.module('gdgPackagedApp', [])
             MessageService.addListener(function(messages) {
                 // Need call $apply since this is an aysnc update to the scope.
                 $scope.$apply(function () {
+                    $scope.udpServer = MessageService.getUDPServer();
                     $scope.messages = messages;
                     // After page update - scroll to bottom - better to force scroll to bottom
                     // on update?
@@ -123,15 +136,8 @@ angular.module('gdgPackagedApp', [])
 
         AboutController: function($scope) {
             console.log("AboutController");
-            chrome.socket.getNetworkList(function (adaptors) {
-                $scope.$apply(function () {
-                    $scope.adaptors = [];
-                    for (var i = 0; i < adaptors.length; i++) {
-                        if (adaptors[i].address.indexOf(':') == -1) {
-                            $scope.adaptors.push(adaptors[i]);
-                        }
-                    }
-                });
+            namespace.gdg.network.init(function () {
+                $scope.adaptors = namespace.gdg.network.getAdaptors();
             });
         }
 

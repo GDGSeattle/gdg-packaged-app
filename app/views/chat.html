@@ -1,4 +1,10 @@
-<label>User name: </label><input id="user-name" type="text" placeholder="enter user name" ng-model="userName">
+<div id="my-ip">{{ udpServer.getIP() }} : {{ udpServer.getPort() }}</div>
+<label for="user-name">User name: </label>
+<input id="user-name" type="text" placeholder="enter user name" ng-model="userName">
+
+<label for="targets">Send to: </label>
+<input id="targets" type="text" placeholder="enter target addresses" ng-model="targets">
+
 <div class="chat">
   <div ng-repeat="message in messages">
     <span class="from">{{ message.from }}</span>{{ message.text }}

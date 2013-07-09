@@ -2,6 +2,16 @@ body {
   padding-top: 60px;
 }
 
+#my-ip {
+text-align: center;
+font-size: 48px;
+margin-bottom: 15px;
+}
+
+label {
+font-weight: bold;
+}
+
 .from {
 font-style: italic;
 font-weight: bold;

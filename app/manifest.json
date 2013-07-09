@@ -6,7 +6,11 @@
   "permissions": ["storage", {"socket": ["udp-bind", "udp-send-to"]}],
   "app": {
     "background": {
-      "scripts": ["js/background.js"]
+      "scripts": [
+          "js/namespace-plus.js",
+          "js/network.js",
+          "js/background.js"
+      ]
     }
   },
   "icons": {

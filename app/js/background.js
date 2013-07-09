@@ -1,5 +1,5 @@
 chrome.app.runtime.onLaunched.addListener(function() {
-    chrome.app.window.create('index.html', {bounds: {width: 700, height: 500}});
+    chrome.app.window.create('index.html', {bounds: {width: 700, height: 550}});
 });
 
 var socket = chrome.socket;
@@ -8,31 +8,7 @@ var udpPort = 9876;
 var socketId;
 var clientId;
 
-socket.create('udp', {}, function(socketInfo) {
-    socketId = socketInfo.socketId;
-    socket.bind(socketId, serverIP, udpPort, function(result) {
-        if (result < 0) {
-            console.error("Could not bind listening UDP port " + serverIP + ':' + udpPort +
-                         " (" + result + ")");
-        }
-    });
-
-    setTimeout(readUDP, 1);
-});
-
-function readUDP() {
-    socket.recvFrom(socketId, 1024, function(info) {
-        if (info.resultCode < 0) {
-            console.erro("Reader error", info);
-            return;
-        }
-        if (info.data.byteLength != 0) {
-            console.log("UDP From: " + info.address + ":" + info.port + ": '" +
-                        bufferToString(info.data) + "'");
-        }
-        setTimeout(readUDP, 1);
-    });
-}
+network = namespace.gdg.network;
 
 function sendSocketData(remoteIP, data) {
     socket.create('udp', null, function(createInfo) {
