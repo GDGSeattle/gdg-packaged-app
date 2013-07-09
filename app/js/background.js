@@ -5,8 +5,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
 var socket = chrome.socket;
 var serverIP;
 var udpPort = 9876;
-var clientId;
-var serverId;
+var socketId;
 
 socket.getNetworkList(function (adaptors) {
     for (var i = 0; i < adaptors.length; i++) {
@@ -17,14 +16,14 @@ socket.getNetworkList(function (adaptors) {
     }
 
     socket.create('udp', {}, function(socketInfo) {
-        serverId = socketInfo.socketId;
-        socket.bind(serverId, '127.0.0.1', udpPort, function(result) {
+        socketId = socketInfo.socketId;
+        socket.bind(socketId, '127.0.0.1', udpPort, function(result) {
             if (result < 0) {
                 console.log("Could not bind listening UDP port " + udpPort);
             }
         });
 
-        socket.recvFrom(serverId, 1024, function(info) {
+        socket.recvFrom(socketId, 1024, function(info) {
             if (info.resultCode < 0) {
                 console.log("Reader error", info);
                 return;
@@ -37,14 +36,8 @@ socket.getNetworkList(function (adaptors) {
 });
 
 function sendSocketData(remoteIP, data) {
-    socket.create('udp', null, function(createInfo) {
-        clientId = createInfo.socketId;
-
-        socket.connect(clientId, remoteIP, udpPort, function(result) {
-            socket.write(clientId, stringToBuffer(data), function(info){
-                socket.destroy(clientId);
-            });
-        });
+    socket.sendTo(socketId, stringToBuffer(data), remoteIP, udpPort, function(result) {
+        console.log("Sent string: '" + data + "' (" + result.bytesWritten + ")");
     });
 }
 
@@ -65,4 +58,7 @@ function bufferToString(b) {
     return s;
 }
 
-sendSocketData('127.0.0.1', "test data");
+setTimeout(function () {
+    sendSocketData('127.0.0.1', "test data");
+},
+           1000);
