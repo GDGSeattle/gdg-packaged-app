@@ -18,11 +18,17 @@ angular.module('gdgPackagedApp', [])
             var udpServer;
             var self = this;
 
+            // TODO: Use promises to clean up callback style
             namespace.gdg.network.init(function () {
-                self.udpServer = namespace.gdg.network.UDPServer(9876);
-                self.udpServer.addListener(function (datagram) {
-                    self.addMessage({from: datagram.fromAddress,
-                                     text: datagram.data})
+                chrome.storage.local.get('nextPort', function(obj) {
+                    port = obj.nextPort++;
+                    chrome.storage.local.set(obj);
+                    self.udpServer = namespace.gdg.network.UDPServer(port);
+                    self.updateListeners();
+                    self.udpServer.addListener(function (datagram) {
+                        self.addMessage({from: datagram.fromAddress,
+                                         text: datagram.data})
+                    });
                 });
             });
 
@@ -32,6 +38,9 @@ angular.module('gdgPackagedApp', [])
             });
 
             chrome.storage.onChanged.addListener(function(changes, areaName) {
+                if (!changes.messages) {
+                    return;
+                }
                 self.updateListeners(changes.messages.newValue);
             });
 
@@ -132,6 +141,9 @@ angular.module('gdgPackagedApp', [])
                 // Need call $apply since this is an aysnc update to the scope.
                 $scope.$apply(function () {
                     $scope.udpServer = MessageService.udpServer;
+                    if (!messages) {
+                        return;
+                    }
                     $scope.messages = messages;
                     // After page update - scroll to bottom - better to force scroll to bottom
                     // on update?
