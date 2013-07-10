@@ -1,58 +1,48 @@
-angular.module('gdgMessages', [])
-    .service({
-        MessageService: function() {
-            var udpServer;
-            var self = this;
+angular.module('gdgMessages', []).service('MessageService', function () {
+    var types = namespace.module('org.startpad.types');
 
-            // TODO: Use promises to clean up callback style
-            namespace.gdg.network.init(function () {
-                chrome.storage.local.get('nextPort', function(obj) {
-                    port = obj.nextPort++;
-                    chrome.storage.local.set(obj);
-                    self.udpServer = namespace.gdg.network.UDPServer(port);
-                    self.updateListeners();
-                    self.udpServer.addListener(function (datagram) {
-                        self.addMessage({from: datagram.fromAddress,
-                                         text: datagram.data})
-                    });
-                });
-            });
+    // Modules are singletons - constructor only called once
+    var self = this;
+    types.extend(self, {
+        'addListener': addListener,
+        'addMessage': addMessage
+    });
 
-            var self = this;
-            chrome.storage.local.get('messages', function(obj) {
-                self.updateListeners(obj.messages);
-            });
+    var udpServer;
+    var messages = [];
+    var listeners = [];
 
-            chrome.storage.onChanged.addListener(function(changes, areaName) {
-                if (!changes.messages) {
-                    return;
-                }
-                self.updateListeners(changes.messages.newValue);
-            });
+    function addListener(listener) {
+        listeners.push(listener);
+    }
 
-            this.listeners = [];
-            this.addListener = function(listener) {
-                this.listeners.push(listener);
-                chrome.storage.local.get('messages', function(obj) {
-                    listener(obj.messages);
-                });
-            };
-
-            this.updateListeners = function(messages) {
-                for (var i = 0; i < this.listeners.length; i++) {
-                    this.listeners[i](messages);
-                }
+    function updateListeners() {
+        setTimeout(function () {
+            for (var i = 0; i < listeners.length; i++) {
+                listeners[i](messages);
             }
+        }, 0);
+    }
 
-            this.addMessage = function (message) {
-                chrome.storage.local.get('messages', function(obj) {
-                    if (!obj.messages) {
-                        obj.messages = [];
-                    }
-                    obj.messages.push(message);
-                    obj.messages = obj.messages.slice(-100);
-                    chrome.storage.local.set(obj);
-                });
-            };
-        }
-    })
+    function addMessage(message) {
+        messages.push(message);
+        messages = messages.slice(-100);
+        updateListeners();
+    }
+
+    function addDatagram(datagram) {
+        addMessage({from: datagram.fromAddress,
+                    text: datagram.data})
+    }
+
+    // TODO: Use promises to clean up callback style
+    namespace.gdg.network.init(function () {
+        chrome.storage.local.get('nextPort', function(obj) {
+            port = obj.nextPort++;
+            chrome.storage.local.set(obj);
+            self.udpServer = namespace.gdg.network.UDPServer(port);
+            updateListeners();
+            self.udpServer.addListener(addDatagram);
+        });
+    });
+});
