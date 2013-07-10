@@ -1,6 +1,5 @@
 <div id="my-ip">{{ udpServer.getIP() }} : {{ udpServer.getPort() }}</div>
-<label for="user-name">User name: </label>
-<input id="user-name" type="text" placeholder="enter user name" ng-model="userName">
+
 
 <label for="targets">Send to: </label>
 <input id="targets" type="text" placeholder="enter target addresses" ng-model="targets">
@@ -11,7 +10,10 @@
   </div>
 </div>
 <form class="input-append">
-  <input class="input-block-level" type="text" ng-model="messageText">
+  <input id="user-name" type="text" placeholder="user name"
+         ng-model="userName" ng-focus="focusName">
+  <input id="message-text" class="input-block-level" type="text"
+         ng-model="messageText" ng-focus="focusMessage">
   <input type="submit" class="btn" ng-click="sendMessage();">Send</button>
 </form>
 <div ng-hide="errorMessage == ''" class="alert">

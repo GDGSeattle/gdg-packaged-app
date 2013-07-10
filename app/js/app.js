@@ -99,6 +99,13 @@ angular.module('gdgPackagedApp', [])
                 $rootScope.userName = $scope.userName;
             });
 
+            // Set the input focus appropriately when the view is created.
+            if (!$scope.userName) {
+                $scope.focusName = true;
+            } else {
+                $scope.focusMessage = true;
+            }
+
             // TODO: not angular-idiomatic - should use a directive?
             var chatDiv = $('div.chat')[0];
 
@@ -106,10 +113,10 @@ angular.module('gdgPackagedApp', [])
                 $scope.showError('');
                 if (!$scope.userName) {
                     $scope.showError("Please enter a user name.");
-                    // TODO: not idiomatic?
-                    $('#user-name').focus();
+                    $scope.focusName = true;
                     return;
                 }
+                $scope.focusName = false;
 
                 if (!$scope.messageText) {
                     $scope.showError("Empty message.");

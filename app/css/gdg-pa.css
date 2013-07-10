@@ -13,13 +13,12 @@ font-weight: bold;
 }
 
 .input-append {
-width: 88%;
+width: 620px;
 margin-top: 15px;
 }
 
 div.chat {
 overflow: auto;
-width: 96%;
 height: 250px;
 border: 1px solid #444;
 background: #eee;
@@ -36,4 +35,12 @@ font-weight: bold;
 display: inline-block;
 margin-left: -100px;
 float: left;
+}
+
+#user-name {
+width: 90px;
+}
+
+#message-text {
+width: 450px;
 }
