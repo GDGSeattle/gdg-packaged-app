@@ -16,14 +16,15 @@ angular.module('gdgPackagedApp', [])
     .service({
         MessageService: function() {
             var udpServer;
+            var self = this;
 
             namespace.gdg.network.init(function () {
-                udpServer = namespace.gdg.network.UDPServer(9876);
+                self.udpServer = namespace.gdg.network.UDPServer(9876);
+                self.udpServer.addListener(function (datagram) {
+                    self.addMessage({from: datagram.fromAddress,
+                                     text: datagram.data})
+                });
             });
-
-            this.getUDPServer = function () {
-                return udpServer;
-            }
 
             var self = this;
             chrome.storage.local.get('messages', function(obj) {
@@ -123,7 +124,7 @@ angular.module('gdgPackagedApp', [])
             MessageService.addListener(function(messages) {
                 // Need call $apply since this is an aysnc update to the scope.
                 $scope.$apply(function () {
-                    $scope.udpServer = MessageService.getUDPServer();
+                    $scope.udpServer = MessageService.udpServer;
                     $scope.messages = messages;
                     // After page update - scroll to bottom - better to force scroll to bottom
                     // on update?

@@ -2,7 +2,7 @@
 
    UDPServer(port) - Create a UDP listener on a given machine port.
 
-   2013: Mike Koss - GDG Seattle
+   by Mike Koss - GDG Seattle, 2013
 */
 namespace.module('gdg.network', function (exports, require) {
     require('org.startpad.funcs').patch();
@@ -14,7 +14,9 @@ namespace.module('gdg.network', function (exports, require) {
         'init': init,
         'getLocalIP': getLocalIP,
         'getAdaptors': getAdaptors,
-        'UDPServer': UDPServer
+        'UDPServer': UDPServer,
+        'sendUDPData': sendUDPData,
+        'parseTarget': parseTarget
     });
 
     var localIP;
@@ -126,24 +128,38 @@ namespace.module('gdg.network', function (exports, require) {
                 }
                 if (info.data.byteLength != 0) {
                     var s = bufferToString(info.data);
-                    self.notifyListeners(s);
                     console.log("UDP From: " + info.address + ":" + info.port + ": '" + s + "'");
+                    self.notifyListeners({fromAddress: info.address,
+                                          fromPort: info.port,
+                                          data: s});
                 }
                 setTimeout(self.readUDP.bind(self), 100);
             });
         }
     });
 
-    function sendSocketData(remoteIP, data) {
+    function parseTarget(s, defaultPort) {
+        var parts = s.split(':');
+        if (parts.length > 2) {
+            return null;
+        }
+        if (parts.length == 1) {
+            parts[1] = defaultPort;
+        }
+        parts[1] = parseInt(parts[1]);
+        return {address: parts[0], port: parts[1]};
+    }
+
+    function sendUDPData(remoteIP, port, data) {
         socket.create('udp', null, function(createInfo) {
-            clientId = createInfo.socketId;
-            socket.connect(clientId, remoteIP, udpPort, function(result) {
+            var clientId = createInfo.socketId;
+            socket.connect(clientId, remoteIP, port, function(result) {
                 socket.write(clientId, stringToBuffer(data), function(result){
                     if (result.bytesWritten < 0) {
                         console.error("Could not write string (" + result.bytesWritten + ")");
                         return;
                     }
-                    console.log("UDP To: " + remoteIP + ":" + udpPort + ":'" +
+                    console.log("UDP To: " + remoteIP + ":" + port + ":'" +
                                 data + "' (" + result.bytesWritten + " bytes)");
                     socket.destroy(clientId);
                 });

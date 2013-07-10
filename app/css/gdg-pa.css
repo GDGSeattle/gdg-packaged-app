@@ -12,14 +12,6 @@ label {
 font-weight: bold;
 }
 
-.from {
-font-style: italic;
-font-weight: bold;
-display: inline-block;
-margin-left: -75px;
-float: left;
-}
-
 .input-append {
 width: 88%;
 margin-top: 15px;
@@ -35,5 +27,13 @@ padding: 0 10px;
 }
 
 div.chat > div {
-margin-left: 75px;
+margin-left: 100px;
+}
+
+.from {
+font-style: italic;
+font-weight: bold;
+display: inline-block;
+margin-left: -100px;
+float: left;
 }
