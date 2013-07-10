@@ -15,6 +15,8 @@ angular.module('gdgPackagedApp')
         // TODO: not angular-idiomatic - should use a directive?
         var chatDiv = $('div.chat')[0];
 
+        MessageService.addPeer({address: '192.168.1.123', port: 9877});
+
         $scope.sendMessage = function () {
             $scope.showError('');
             if (!$scope.userName) {
@@ -38,9 +40,6 @@ angular.module('gdgPackagedApp')
             // Need call $apply since this is an aysnc update to the scope.
             $scope.$apply(function () {
                 $scope.udpServer = MessageService.udpServer;
-                if (!messages) {
-                    return;
-                }
                 $scope.messages = messages;
                 // After page update - scroll to bottom - better to force scroll to bottom
                 // on update?
