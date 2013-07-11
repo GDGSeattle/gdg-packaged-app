@@ -54,7 +54,7 @@ angular.module('gdgPackagedApp')
 })
 .controller('PeerDialog', function($scope, MessageService) {
     $('#peer-dialog').on('shown', function (e) {
-        $('#peer-address').focus();
+        $('#peer-address').val('').focus();
     });
 
     $scope.submit = function () {
