@@ -1,9 +1,5 @@
 <div id="my-ip">{{ udpServer.getIP() }} : {{ udpServer.getPort() }}</div>
 
-
-<label for="targets">Send to: </label>
-<input id="targets" type="text" placeholder="enter target addresses" ng-model="targets">
-
 <div class="row">
     <div class="chat span6">
       <div ng-repeat="message in messages">
