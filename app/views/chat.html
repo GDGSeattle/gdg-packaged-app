@@ -32,18 +32,17 @@
 
 <!-- TODO: Use angularUI instead of bootstrap? -->
 <div id="peer-dialog" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3 id="myModalLabel">Add Peer Address</h3>
-  </div>
-  <form ng-submit="addPeer(peerAddress);">
-  <div class="modal-body">
-    <input id='peer-address' type="text" placeholder="IP:port"
-           ng-model="peerAddress">
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">Close</button>
-    <input type="submit" class="btn btn-primary" value="Add Peer"/>
-  </div>
+  <form ng-submit="submit()" ng-controller="PeerDialog">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3>Add Peer Address</h3>
+    </div>
+    <div class="modal-body">
+      <input id='peer-address' type="text" placeholder="IP:port"
+             ng-model="peerAddress">
+    </div>
+    <div class="modal-footer">
+      <input type="submit" class="btn btn-primary" value="Add Peer"/>
+    </div>
   </form>
 </div>

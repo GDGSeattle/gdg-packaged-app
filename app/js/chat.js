@@ -33,16 +33,6 @@ angular.module('gdgPackagedApp')
         $scope.messageText = "";
     }
 
-    $('#peer-dialog').on('shown', function (e) {
-        $('#peer-address').focus();
-    });
-
-    $scope.addPeer = function (peerAddress) {
-        MessageService.addPeer({address: peerAddress, port: 9876});
-        $('#peer-dialog').modal('hide');
-
-    }
-
     MessageService.addListener(function(messages, peers) {
         // Need call $apply since this is an aysnc update to the scope.
         $scope.$apply(function () {
@@ -57,6 +47,14 @@ angular.module('gdgPackagedApp')
         });
     });
 })
-.controller('PeerController', function($scope, MessageService) {
+.controller('PeerDialog', function($scope, MessageService) {
+    $('#peer-dialog').on('shown', function (e) {
+        $('#peer-address').focus();
+    });
+
+    $scope.submit = function () {
+        MessageService.addPeer({address: $scope.peerAddress, port: 9876});
+        $('#peer-dialog').modal('hide');
+    }
 })
 ;
