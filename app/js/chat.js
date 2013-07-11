@@ -18,6 +18,11 @@ angular.module('gdgPackagedApp')
         $scope.showError('');
         if (!$scope.userName) {
             $scope.showError("Please enter a user name.");
+            // BUG: angular will not re-focus the element if focusName
+            // was true on entry to sendMessage ... requires state
+            // change to re-focus the element.
+            // A hack would be to set to false, then use $timeout to
+            // set back to true.
             $scope.focusName = true;
             return;
         }
