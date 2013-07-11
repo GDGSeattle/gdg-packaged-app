@@ -43,6 +43,11 @@ angular.module('gdgMessages', []).service('MessageService', function () {
         }, 1);
     }
 
+    // Message in format:
+    // {source: "local" or "IP:port",
+    //  from: "user",
+    //  text: "message"
+    // }
     function addMessage(message, opt) {
         var options = types.extend({sendToPeers: true}, opt);
         messages.push(message);
@@ -75,12 +80,21 @@ angular.module('gdgMessages', []).service('MessageService', function () {
                 continue;
             }
             // TODO: Change to JSON formatted messages
-            network.sendUDPData(peer.address, peer.port, message.text);
+            network.sendUDPData(peer.address, peer.port, message);
         }
     }
 
+    // Reveive data in this format:
+    // {fromAddress: X.X.X.X
+    //  fromPort: xxx
+    //  data.from: "user",
+    //  data.text: "message"
+    // }
     function addDatagram(datagram) {
-        addMessage({from: datagram.fromAddress, text: datagram.data},
+        addMessage({source: datagram.fromAddress + ':' + datagram.fromPort,
+                    from: datagram.data.from,
+                    text: datagram.data.text
+                   },
                    {sendToPeers: false})
     }
 });

@@ -33,7 +33,8 @@ angular.module('gdgPackagedApp')
             return;
         }
 
-        MessageService.addMessage({from: $scope.userName,
+        MessageService.addMessage({source: "local",
+                                   from: $scope.userName,
                                    text: $scope.messageText});
         $scope.messageText = "";
     }

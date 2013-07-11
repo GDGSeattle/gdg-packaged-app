@@ -7,6 +7,7 @@
 namespace.module('gdg.network', function (exports, require) {
     require('org.startpad.funcs').patch();
     var string = require('org.startpad.string');
+    var types = require('org.startpad.types');
 
     var socket = chrome.socket;
     var initialized = false;
@@ -129,7 +130,14 @@ namespace.module('gdg.network', function (exports, require) {
                 }
                 if (info.data.byteLength != 0) {
                     var s = bufferToString(info.data);
-                    console.log("UDP From: " + info.address + ":" + info.port + ": '" + s + "'");
+                    try {
+                        s = JSON.parse(s);
+                    } catch(e) {
+                        console.warning("Recieved non-JSON packet.");
+                        s = {text: s};
+                    }
+                    console.log("UDP From: " + info.address + ":" + info.port + ": '" +
+                                JSON.stringify(s) + "'");
                     self.notifyListeners({fromAddress: info.address,
                                           fromPort: info.port,
                                           data: s});
@@ -156,6 +164,9 @@ namespace.module('gdg.network', function (exports, require) {
     }
 
     function sendUDPData(remoteIP, port, data) {
+        if (!types.isType(data, 'string')) {
+            data = JSON.stringify(data);
+        }
         socket.create('udp', null, function(createInfo) {
             var clientId = createInfo.socketId;
             socket.connect(clientId, remoteIP, port, function(result) {
