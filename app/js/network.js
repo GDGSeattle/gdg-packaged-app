@@ -6,6 +6,7 @@
 */
 namespace.module('gdg.network', function (exports, require) {
     require('org.startpad.funcs').patch();
+    var string = require('org.startpad.string');
 
     var socket = chrome.socket;
     var initialized = false;
@@ -139,6 +140,7 @@ namespace.module('gdg.network', function (exports, require) {
     });
 
     function parseTarget(s, defaultPort) {
+        s = string.strip(s);
         var parts = s.split(':');
         if (parts.length > 2) {
             return null;
@@ -147,6 +149,9 @@ namespace.module('gdg.network', function (exports, require) {
             parts[1] = defaultPort;
         }
         parts[1] = parseInt(parts[1]);
+        if (isNaN(parts[1]) || parts[1] <= 0) {
+            return null;
+        }
         return {address: parts[0], port: parts[1]};
     }
 

@@ -42,7 +42,13 @@ padding: 0 10px;
 }
 
 div.peers > div {
+position: relative;
 color: yellow;
+}
+
+.remove-peer {
+position: absolute;
+right: 0;
 }
 
 #add-peer {

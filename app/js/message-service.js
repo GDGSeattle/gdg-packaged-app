@@ -1,5 +1,6 @@
 angular.module('gdgMessages', []).service('MessageService', function () {
     var types = namespace.module('org.startpad.types');
+    var string = namespace.module('org.startpad.string');
     var network = namespace.module('gdg.network');
 
     // Modules are singletons - constructor only called once
@@ -8,13 +9,26 @@ angular.module('gdgMessages', []).service('MessageService', function () {
         'addListener': addListener,
         'addMessage': addMessage,
         'addPeer': addPeer,
-        'sendToPeers': sendToPeers
+        'sendToPeers': sendToPeers,
+        'removePeer': removePeer
     });
 
     var udpServer;
     var messages = [];
     var listeners = [];
     var peers = [];
+    var nextPeerId = 0;
+
+    // TODO: Use promises to clean up callback style
+    network.init(function () {
+        chrome.storage.local.get('nextPort', function(obj) {
+            port = obj.nextPort++;
+            chrome.storage.local.set(obj);
+            self.udpServer = network.UDPServer(port);
+            updateListeners();
+            self.udpServer.addListener(addDatagram);
+        });
+    });
 
     function addListener(listener) {
         listeners.push(listener);
@@ -40,12 +54,18 @@ angular.module('gdgMessages', []).service('MessageService', function () {
     }
 
     function addPeer(peer) {
+        peer.id = nextPeerId++;
         peers.push(peer);
-        return peers.length - 1;
     }
 
     function removePeer(id) {
-        delete peers[id];
+        for (var i = 0; i < peers.length; i++) {
+            var peer = peers[i];
+            if (peer.id == id) {
+                peers.splice(i, 1);
+                return;
+            }
+        }
     }
 
     function sendToPeers(message) {
@@ -63,15 +83,4 @@ angular.module('gdgMessages', []).service('MessageService', function () {
         addMessage({from: datagram.fromAddress, text: datagram.data},
                    {sendToPeers: false})
     }
-
-    // TODO: Use promises to clean up callback style
-    network.init(function () {
-        chrome.storage.local.get('nextPort', function(obj) {
-            port = obj.nextPort++;
-            chrome.storage.local.set(obj);
-            self.udpServer = network.UDPServer(port);
-            updateListeners();
-            self.udpServer.addListener(addDatagram);
-        });
-    });
 });

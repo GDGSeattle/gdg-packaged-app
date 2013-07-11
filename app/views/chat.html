@@ -9,7 +9,9 @@
 
     <div class="peers span2">
       <div ng-repeat="peer in peers">
-        {{ peer.address }}
+        {{ peer.address }}:{{ peer.port}}
+        <a ng-click="removePeer(peer)">
+          <i class="remove-peer icon-remove-sign icon-white"/>
       </div>
       <a href="#peer-dialog" data-toggle="modal">
         <i id="add-peer" class="icon-plus-sign icon-white"/>
@@ -42,6 +44,10 @@
              ng-model="peerAddress">
     </div>
     <div class="modal-footer">
+      <div ng-hide="errorMessage == ''" class="alert">
+        <button type="button" class="close" ng-click="showError('');">&times;</button>
+        <span>{{ errorMessage }}&nbsp;</span>
+      </div>
       <input type="submit" class="btn btn-primary" value="Add Peer"/>
     </div>
   </form>
