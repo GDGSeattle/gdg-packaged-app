@@ -18,14 +18,15 @@ angular.module('gdgMessages', []).service('MessageService', function () {
 
     function addListener(listener) {
         listeners.push(listener);
+        updateListeners();
     }
 
     function updateListeners() {
         setTimeout(function () {
             for (var i = 0; i < listeners.length; i++) {
-                listeners[i](messages);
+                listeners[i](messages, peers);
             }
-        }, 0);
+        }, 1);
     }
 
     function addMessage(message, opt) {

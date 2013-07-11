@@ -12,11 +12,6 @@ label {
 font-weight: bold;
 }
 
-.input-append {
-width: 620px;
-margin-top: 15px;
-}
-
 div.chat {
 overflow: auto;
 height: 250px;
@@ -37,10 +32,33 @@ margin-left: -100px;
 float: left;
 }
 
+div.peers {
+position: relative;
+overflow: auto;
+height: 250px;
+border: 1px solid #444;
+background: #666;
+padding: 0 10px;
+}
+
+div.peers > div {
+color: yellow;
+}
+
+#add-peer {
+position: absolute;
+bottom: 7px;
+right: 7px;
+}
+
 #user-name {
 width: 90px;
 }
 
 #message-text {
-width: 450px;
+width: 492px;
+}
+
+.input-append {
+margin-top: 15px;
 }

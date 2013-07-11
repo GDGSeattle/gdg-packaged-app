@@ -4,11 +4,23 @@
 <label for="targets">Send to: </label>
 <input id="targets" type="text" placeholder="enter target addresses" ng-model="targets">
 
-<div class="chat">
-  <div ng-repeat="message in messages">
-    <span class="from">{{ message.from }}</span>{{ message.text }}
-  </div>
+<div class="row">
+    <div class="chat span6">
+      <div ng-repeat="message in messages">
+        <span class="from">{{ message.from }}</span>{{ message.text }}
+      </div>
+    </div>
+
+    <div class="peers span2">
+      <div ng-repeat="peer in peers">
+        {{ peer.address }}
+      </div>
+      <a href="#peer-dialog" data-toggle="modal">
+        <i id="add-peer" class="icon-plus-sign icon-white"/>
+      </a>
+    </div>
 </div>
+
 <form class="input-append">
   <input id="user-name" type="text" placeholder="user name"
          ng-model="userName" ng-focus="focusName">
@@ -16,7 +28,24 @@
          ng-model="messageText" ng-focus="focusMessage">
   <input type="submit" class="btn" ng-click="sendMessage();">Send</button>
 </form>
+
 <div ng-hide="errorMessage == ''" class="alert">
   <button type="button" class="close" ng-click="showError('');">&times;</button>
   <span>{{ errorMessage }}&nbsp;</span>
+</div>
+
+<!-- TODO: Use angularUI instead of bootstrap? -->
+<div id="peer-dialog" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3 id="myModalLabel">Add Peer Address</h3>
+  </div>
+  <div class="modal-body">
+    <input type="text" placeholder="IP:port"
+           ng-model="peerAddress">
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn btn-primary" ng-click="addPeer(peerAddress);">Add Peer</button>
+  </div>
 </div>
