@@ -22,7 +22,7 @@
          ng-model="userName" ng-focus="focusName">
   <input id="message-text" class="input-block-level" type="text"
          ng-model="messageText" ng-focus="focusMessage">
-  <input type="submit" class="btn" ng-click="sendMessage();">Send</button>
+  <input type="submit" class="btn" ng-click="sendMessage();" value="Send"/>
 </form>
 
 <div ng-hide="errorMessage == ''" class="alert">
@@ -36,12 +36,14 @@
     <button type="button" class="close" data-dismiss="modal">×</button>
     <h3 id="myModalLabel">Add Peer Address</h3>
   </div>
+  <form ng-submit="addPeer(peerAddress);">
   <div class="modal-body">
-    <input type="text" placeholder="IP:port"
+    <input id='peer-address' type="text" placeholder="IP:port"
            ng-model="peerAddress">
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal">Close</button>
-    <button class="btn btn-primary" ng-click="addPeer(peerAddress);">Add Peer</button>
+    <input type="submit" class="btn btn-primary" value="Add Peer"/>
   </div>
+  </form>
 </div>

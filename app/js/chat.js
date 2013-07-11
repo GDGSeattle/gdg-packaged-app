@@ -33,6 +33,10 @@ angular.module('gdgPackagedApp')
         $scope.messageText = "";
     }
 
+    $('#peer-dialog').on('shown', function (e) {
+        $('#peer-address').focus();
+    });
+
     $scope.addPeer = function (peerAddress) {
         MessageService.addPeer({address: peerAddress, port: 9876});
         $('#peer-dialog').modal('hide');
